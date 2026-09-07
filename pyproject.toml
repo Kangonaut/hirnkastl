@@ -1,0 +1,27 @@
+[project]
+name = "hirnkastl"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Kangonaut", email = "120662571+Kangonaut@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "filetype>=1.2.0",
+    "openai>=3.8.0",
+    "platformdirs>=4.11.7",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "python-dotenv>=1.2.3",
+    "pyyaml>=6.0.3",
+    "questionary>=2.1.1",
+    "rich>=15.0.0",
+]
+
+[project.scripts]
+hirnkastl = "hirnkastl:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
