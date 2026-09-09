@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "filetype>=1.2.0",
+    "genanki>=0.13.1",
     "openai>=3.8.0",
     "platformdirs>=4.11.7",
     "pydantic>=2.13.5",
@@ -17,6 +18,7 @@ dependencies = [
     "pyyaml>=6.0.3",
     "questionary>=2.1.1",
     "rich>=15.0.0",
+    "typer>=0.27.2",
 ]
 
 [project.scripts]
