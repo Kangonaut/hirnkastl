@@ -4,6 +4,8 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from rich import print
 
+from hirnkastl.cards import CodeTracingCard, Flashcard, MathCard
+
 dirs = PlatformDirs(appname="hirnkastl")
 
 CONFIG_FILE = dirs.user_config_path / "config.yaml"
@@ -12,7 +14,7 @@ CONFIG_FILE = dirs.user_config_path / "config.yaml"
 class Config(BaseSettings):
     openai_api_key: str
     openai_model: str
-    flashcard_instruction: str
+    card_prompts: dict[str, str] = Field(default_factory=dict)
 
     model_config = SettingsConfigDict(env_file=None)
 
