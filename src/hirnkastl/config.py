@@ -1,14 +1,18 @@
+from pathlib import Path
+from typing import Any, Self, TypeVar
+
 import yaml
 from platformdirs import PlatformDirs
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from rich import print
 
+from hirnkastl import consts, utils
 from hirnkastl.cards import CodeTracingCard, Flashcard, MathCard
 
-dirs = PlatformDirs(appname="hirnkastl")
-
-CONFIG_FILE = dirs.user_config_path / "config.yaml"
+DEFAULT_VALUE_REGISTRY: dict[str, Any] = {
+    "card_prompts": consts.DEFAULT_CARD_PROMPTS,
+}
 
 
 class Config(BaseSettings):
@@ -18,14 +22,14 @@ class Config(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=None)
 
+    @classmethod
+    def from_default(cls, **args):
+        # replace missing fields with defaults
+        for field, value in DEFAULT_VALUE_REGISTRY.items():
+            if field not in args:
+                args[field] = value
 
-def load_config() -> Config:
-    if not CONFIG_FILE.exists():
-        print("Config file does not exist. Please run `hirnkastl setup` first.")
-        raise SystemExit(1)
-
-    with open(CONFIG_FILE, "r") as file:
-        return Config.model_validate(yaml.safe_load(file))
+        return Config(**args)
 
 
 _settings = None
@@ -36,6 +40,6 @@ def __getattr__(name: str):
     global _settings
     if name == "settings":
         if _settings is None:
-            _settings = load_config()
+            _settings = utils.load_config()
         return _settings
     raise AttributeError(f"Module {__name__!r} has no attribute {name}.")
