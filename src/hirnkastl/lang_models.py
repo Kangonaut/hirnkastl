@@ -1,11 +1,12 @@
 import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import override
+from typing import List, override
 
-from openai import OpenAI
+from openai import BaseModel, OpenAI
 
 from hirnkastl import utils
+from hirnkastl.cards import MathCard
 from hirnkastl.config import settings
 
 
@@ -18,6 +19,8 @@ class AbstractLangModel(ABC):
         user_input: str = "",
     ) -> str:
         pass
+
+    def generate_cards(self):
 
 
 class OpenAiModel(AbstractLangModel):
@@ -40,6 +43,7 @@ class OpenAiModel(AbstractLangModel):
         instruction: str,
         attachment_path: Path,
         user_input: str = "",
+        response_model,
     ) -> str:
 
         file_mime = utils.get_file_mime(attachment_path)
@@ -48,7 +52,7 @@ class OpenAiModel(AbstractLangModel):
         if file_mime not in self.SUPPORTED_FILE_TYPES:
             raise Exception(f"Unsupported attachment file type: {file_mime}")
 
-        response = self.client.responses.create(
+        response = self.client.responses.parse(
             model=self.model,
             instructions=instruction,
             input=[
@@ -67,5 +71,6 @@ class OpenAiModel(AbstractLangModel):
                     ],
                 }
             ],
+            text_format=MathFlashcardResponse,
         )
-        return response.output_text
+        return response.output_parsed
