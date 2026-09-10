@@ -1,5 +1,5 @@
 <div align="center">
-<img src="assets/icon.jpeg" alt="icon" width="192"/>
+<img src="assets/icon.png" alt="icon" width="192"/>
 
 # hirnkastl
 
