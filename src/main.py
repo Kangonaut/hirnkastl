@@ -1,4 +1,6 @@
+from datetime import datetime
 from pathlib import Path
+from typing import Annotated
 
 import questionary
 import typer
@@ -95,13 +97,27 @@ def display_cards(cards: list[BaseCard]) -> None:
 
 @app.command()
 def gen(
+    tags: Annotated[
+        list[str],
+        typer.Option(
+            "--tag",
+            "-t",
+            default_factory=list,
+            callback=validators.validate_tags,
+            help="Tags to apply to the generated cards (spaces are automatically converted to underscores).",
+        ),
+    ],
     deck_name: str = typer.Argument(metavar="DECK"),
     card_type: CardType = typer.Argument(),
     document: Path = typer.Argument(),
     comment: str | None = typer.Option(default=None),
     skip_review: bool = typer.Option(is_flag=True, default=False),
-    export_name: str | None = typer.Option(default=None),
+    export_name: str = typer.Option(
+        callback=validators.validate_export_name,
+        default_factory=utils.gen_export_name,
+    ),
 ):
+    # load decks
     decks = utils.load_decks()
 
     # check if deck exists
@@ -119,9 +135,14 @@ def gen(
         )
         raise typer.Exit(code=1)
 
+    # configure model
+    model = OpenAiModel()
+
+    # add model tag
+    tags.append(f"hirnkastl::{model.model}")
+
     # generate cards
     with console.status("Generating flashcards...", spinner="dots"):
-        model = OpenAiModel()
         cards = model.generate_cards(card_type, document, comment)
 
     # review cards
@@ -142,11 +163,12 @@ def gen(
     # add cards to deck
     anki_deck = utils.deck_to_anki_deck(deck)
     for card in cards:
-        note = utils.card_to_anki_note(card)
+        note = utils.card_to_anki_note(card, export_name, tags)
         anki_deck.add_note(note)
 
     # export
-    export_path = utils.export_anki_deck(anki_deck, export_name)
+    export_path = consts.EXPORTS_DIR / f"{export_name}.apkg"
+    utils.export_anki_deck(anki_deck, export_path)
     export_path_uri = export_path.resolve().as_uri()
     console.print(
         f"[bold green]SUCCESS:[/bold green] The Anki package was generated and saved to: [link={export_path_uri}][cyan]{export_path.resolve()}[/cyan][/link]\n"

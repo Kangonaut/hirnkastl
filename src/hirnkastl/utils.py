@@ -105,7 +105,11 @@ def get_card_class_from_type(card_type: CardType) -> type:
     return consts.CARD_TYPE_CLASSES[card_type]
 
 
-def card_to_anki_note(card: BaseCard) -> genanki.Note:
+def card_to_anki_note(
+    card: BaseCard,
+    export_name: str,
+    tags: list[str],
+) -> genanki.Note:
     if isinstance(card, MathCard):
         return genanki.Note(
             model=consts.CARD_TYPE_ANKI_MODELS[CardType.MATH],
@@ -114,6 +118,11 @@ def card_to_anki_note(card: BaseCard) -> genanki.Note:
                 card.category.value,
                 card.question,
                 card.answer,
+            ],
+            tags=[
+                f"hirnkastl::{export_name}",
+                f"hirnkastl::{card.topic.lower().replace(" ", "_")}",
+                *tags,
             ],
         )
     elif isinstance(card, GenericCard):
@@ -136,10 +145,11 @@ def deck_to_anki_deck(deck: Deck) -> genanki.Deck:
     )
 
 
-def export_anki_deck(deck: genanki.Deck, export_name: str | None = None) -> Path:
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    path = consts.EXPORTS_DIR / f"{export_name or f"hirnkastl-export-{timestamp}"}.apkg"
+def export_anki_deck(deck: genanki.Deck, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-
     genanki.Package(deck).write_to_file(path)
-    return path
+
+
+def gen_export_name() -> str:
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    return f"hirnkastl-export-{timestamp}"
