@@ -8,7 +8,7 @@ from hirnkastl.cards import CardType, GenericCard, MathCard
 dirs = PlatformDirs(appname="hirnkastl")
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
-CACHE_DIR = dirs.user_cache_dir
+CACHE_DIR = dirs.user_cache_path
 CONFIG_FILE = dirs.user_config_path / "config.yaml"
 DECKS_CACHE_FILE = dirs.user_cache_path / "decks.yaml"
 EXPORTS_DIR = dirs.user_data_path / "exports"

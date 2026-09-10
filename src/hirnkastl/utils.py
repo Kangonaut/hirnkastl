@@ -165,11 +165,12 @@ def abort_with_error(message: str) -> None:
     raise typer.Exit(code=1)
 
 
-def save_cards_to_file(cards: list[BaseModel], path: Path) -> None:
+def save_cards_to_file(cards: list[BaseCard], path: Path) -> None:
     data = [card.model_dump() for card in cards]
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def load_cards_from_file(path: Path, card_type_cls: type[BaseCard]) -> list[BaseModel]:
+def load_cards_from_file(path: Path, card_type: CardType) -> list[BaseCard]:
+    card_type_class = get_card_class_from_type(card_type)
     raw_data = json.loads(path.read_text(encoding="utf-8"))
-    return [card_type_cls(**item) for item in raw_data]
+    return [card_type_class(**item) for item in raw_data]

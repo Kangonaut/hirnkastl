@@ -15,19 +15,13 @@ console = Console()
 
 @app.command("add")
 def add_deck(
-    name: Annotated[
-        str,
-        typer.Argument(
-            help="The unique name for the new deck.",
-        ),
-    ],
-    description: Annotated[
-        str,
-        typer.Argument(
-            default="",
-            help="An optional description of the deck's contents.",
-        ),
-    ],
+    name: str = typer.Argument(
+        help="The unique name for the new deck.",
+    ),
+    description: str = typer.Argument(
+        default="",
+        help="An optional description of the deck's contents.",
+    ),
 ):
     """
     Create a new Anki deck profile.
