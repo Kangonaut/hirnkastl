@@ -1,3 +1,12 @@
+<div align="center">
+<img src="assets/icon.jpeg" alt="icon" width="192"/>
+
+# hirnkastl
+
+[![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Kangonaut/hirnkastl/blob/main/LICENSE)
+
+</div>
+
 # hirnkastl
 
 **hirnkastl** is a powerful command-line interface (CLI) tool that uses AI to automatically generate structured Anki flashcards from your study documents, lecture notes, and math scripts. Built with Python, Typer, Rich, and OpenAI.
@@ -110,4 +119,10 @@ hirnkastl gen math-deck math skriptum-ausschnitt.pdf --tags algebra --tags exam-
 
 ## License
 
-Distributed under the Apache 2 License. See `LICENSE` for more information.
+Distributed under the [Apache License 2.0](https://github.com/Kangonaut/hirnkastl/blob/main/LICENSE).
+
+---
+
+<div align="center">
+<a href="https://www.buymeacoffee.com/kangonaut" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+</div>
