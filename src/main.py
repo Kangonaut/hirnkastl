@@ -2,8 +2,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
+import openai
 import questionary
 import typer
+from pydantic import ValidationError
 from rich.console import Console
 from rich.table import Table
 
@@ -25,6 +27,12 @@ console = Console()
 
 @app.command()
 def setup():
+    """
+    Run the interactive configuration wizard.
+
+    Prompts for your OpenAI API key and preferred model, and saves
+    them to the local Hirnkastl configuration file.
+    """
     try:
         openai_api_key = questionary.text(
             message="OpenAI API key:",
@@ -63,12 +71,12 @@ def display_cards(cards: list[BaseCard]) -> None:
     table.add_column("Number", style="dim")
 
     if card_type is GenericCard:
-        table.add_column("Question", style="white")
-        table.add_column("Answer", style="white")
+        table.add_column("Question", style="white", ratio=1)
+        table.add_column("Answer", style="white", ratio=2)
     elif card_type is MathCard:
         table.add_column("Category", style="bold green")
-        table.add_column("Question", style="white")
-        table.add_column("Question", style="white")
+        table.add_column("Question", style="white", ratio=1)
+        table.add_column("Question", style="white", ratio=2)
         table.add_column("Topic", style="bold blue")
     else:
         raise TypeError(f"Unknown type: {card_type}")
@@ -97,6 +105,47 @@ def display_cards(cards: list[BaseCard]) -> None:
 
 @app.command()
 def gen(
+    deck_name: Annotated[
+        str,
+        typer.Argument(
+            metavar="DECK",
+            help="The name of the target Anki deck (must exist in your local decks).",
+        ),
+    ],
+    document: Annotated[
+        Path,
+        typer.Argument(help="Path to the source document to extract knowledge from."),
+    ],
+    card_type: Annotated[
+        CardType,
+        typer.Option(
+            default="generic",
+            help="The structural schema for the flashcards (e.g., 'math' or 'generic').",
+        ),
+    ],
+    comment: Annotated[
+        str | None,
+        typer.Option(
+            default=None,
+            help="Custom instructions for the AI prompt (e.g., 'Focus only on definitions').",
+        ),
+    ],
+    skip_review: Annotated[
+        bool,
+        typer.Option(
+            is_flag=True,
+            default=False,
+            help="Bypass the interactive table preview and generate the Anki package immediately.",
+        ),
+    ],
+    export_name: Annotated[
+        str,
+        typer.Option(
+            callback=validators.validate_export_name,
+            default_factory=utils.gen_export_name,
+            help="Custom filename for the generated .apkg file (without extension).",
+        ),
+    ],
     tags: Annotated[
         list[str],
         typer.Option(
@@ -107,33 +156,33 @@ def gen(
             help="Tags to apply to the generated cards (spaces are automatically converted to underscores).",
         ),
     ],
-    deck_name: str = typer.Argument(metavar="DECK"),
-    card_type: CardType = typer.Argument(),
-    document: Path = typer.Argument(),
-    comment: str | None = typer.Option(default=None),
-    skip_review: bool = typer.Option(is_flag=True, default=False),
-    export_name: str = typer.Option(
-        callback=validators.validate_export_name,
-        default_factory=utils.gen_export_name,
-    ),
+    open: Annotated[
+        bool,
+        typer.Option(
+            "--open",
+            "-o",
+            is_flag=True,
+            help="Open the generated .apkg file after generation for importing into Anki.",
+        ),
+    ],
 ):
+    """
+    Generate Anki flashcards from a document using AI.
+
+    Parses the target document using your configured OpenAI model, applies
+    the selected card schema, and compiles an importable Anki package (.apkg).
+    """
     # load decks
     decks = utils.load_decks()
 
     # check if deck exists
     if deck_name not in decks:
-        console.print(
-            f"[bold red]ERROR:[/bold red] A deck with the name {deck_name} does not exist."
-        )
-        raise typer.Exit(code=1)
+        utils.abort_with_error(f"A deck with the name {deck_name} does not exist.")
     deck = decks[deck_name]
 
     # check if file exists
     if not document.exists():
-        console.print(
-            f"[bold red]ERROR:[/bold red] The specified document path does not exist."
-        )
-        raise typer.Exit(code=1)
+        utils.abort_with_error("The specified document path does not exist.")
 
     # configure model
     model = OpenAiModel()
@@ -142,8 +191,28 @@ def gen(
     tags.append(f"hirnkastl::{model.model}")
 
     # generate cards
-    with console.status("Generating flashcards...", spinner="dots"):
-        cards = model.generate_cards(card_type, document, comment)
+    cards = []
+    try:
+        with console.status("Generating flashcards...", spinner="dots"):
+            cards = model.generate_cards(card_type, document, comment)
+    except openai.AuthenticationError:
+        utils.abort_with_error(
+            "Invalid OpenAI API key. Please run [cyan]hirnkastl setup[/cyan] to reconfigure your key."
+        )
+    except openai.RateLimitError:
+        utils.abort_with_error(
+            "OpenAI rate limit exceeded or insufficient account balance. Please check your billing dashboard."
+        )
+    except openai.APIConnectionError:
+        utils.abort_with_error(
+            "Failed to connect to the OpenAI API. Please check your internet connection."
+        )
+    except ValidationError as e:
+        utils.abort_with_error(
+            f"The AI generated malformed data that couldn't be parsed.\n[dim]{e}[/dim]"
+        )
+    except Exception as e:
+        utils.abort_with_error(str(e))
 
     # review cards
     if not skip_review:
@@ -172,8 +241,12 @@ def gen(
     export_path_uri = export_path.resolve().as_uri()
     console.print(
         f"[bold green]SUCCESS:[/bold green] The Anki package was generated and saved to: [link={export_path_uri}][cyan]{export_path.resolve()}[/cyan][/link]\n"
-        "[dim]Open Anki and import this file to load your cards.[/dim]"
+        "[dim]Open Anki and import this file to load your cards. If your terminal supports it, you can click the link above to automatically start the import process.[/dim]"
     )
+
+    # open file to start import
+    if open:
+        typer.launch(str(export_path.resolve()))
 
 
 if __name__ == "__main__":
