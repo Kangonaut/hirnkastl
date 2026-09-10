@@ -7,27 +7,7 @@
 
 </div>
 
-`hirnkastl` is a command-line tool (CLI) tool that uses AI to automatically generate structured Anki flashcards from your lecture notes. Built with Python, Typer, Rich, and OpenAI.
-
-## Features
-
-- **AI-Powered Generation:** Upload raw PDFs or study materials and let OpenAI parse them into structured flashcards.
-- **Schema Support:** Out-of-the-box support for different card formats (e.g., **Generic** questions/answers and **Math** cards equipped with categories like definitions, theorems, and exercises).
-- **Interactive Review:** Inspect generated flashcards in a neatly formatted terminal table before committing them to your deck.
-- **Smart Caching:** Aborted a review? Hirnkastl automatically caches your generated cards so you don't lose progress or waste API credits. Re-import them anytime using `--from-cache`.
-- **Native Anki Packages (`.apkg`):** Compiles standard Anki package files that are 100% stable, requiring zero fragile local API add-ons.
-- **Auto-Import Option:** Automatically open the generated `.apkg` file with your operating system's default handler to jump straight into Anki.
-
-## Installation
-
-Clone the repository and install the project using your preferred Python package manager (e.g., Poetry or pip):
-
-```bash
-git clone https://github.com/your-username/hirnkastl.git
-cd hirnkastl
-pip install .
-
-```
+`hirnkastl` is a CLI tool that uses AI to automatically generate structured Anki flashcards from your lecture notes. Built with Python, Typer, Rich, and OpenAI.
 
 ## Installation
 
