@@ -1,15 +1,11 @@
-from logging import raiseExceptions
 from pathlib import Path
 
-import genanki
 import questionary
 import typer
-from questionary import question
 from rich.console import Console
 from rich.table import Table
-from typer.params import Argument, Option
 
-from hirnkastl import commands, consts, utils, validators
+from hirnkastl import consts, utils, validators
 from hirnkastl.cards import BaseCard, CardType, GenericCard, MathCard
 from hirnkastl.commands import deck
 from hirnkastl.config import Config
@@ -151,8 +147,9 @@ def gen(
 
     # export
     export_path = utils.export_anki_deck(anki_deck, export_name)
+    export_path_uri = export_path.resolve().as_uri()
     console.print(
-        f"[bold green]SUCCESS:[/bold green] The Anki package was generated and saved to: [cyan]{export_path.resolve()}[/cyan]\n"
+        f"[bold green]SUCCESS:[/bold green] The Anki package was generated and saved to: [link={export_path_uri}][cyan]{export_path.resolve()}[/cyan][/link]\n"
         "[dim]Open Anki and import this file to load your cards.[/dim]"
     )
 
