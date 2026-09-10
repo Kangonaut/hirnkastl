@@ -21,7 +21,7 @@ def add_deck(
     # check for unique name
     if name in decks:
         console.print(
-            f"[bold red]Error:[/bold red] A deck named [cyan]{name}[/cyan] already exists."
+            f"[bold red]ERROR:[/bold red] A deck named [cyan]{name}[/cyan] already exists."
         )
         raise typer.Exit(code=1)
 

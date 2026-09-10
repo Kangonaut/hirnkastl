@@ -1,35 +1,45 @@
-import os
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import List, override
 
-from openai import BaseModel, OpenAI
+from openai import OpenAI
+from pydantic import BaseModel
 
-from hirnkastl import utils
-from hirnkastl.cards import MathCard
+from hirnkastl import consts, utils
+from hirnkastl.cards import BaseCard, CardType
 from hirnkastl.config import settings
+
+
+class BatchCardResponse[T: BaseModel](BaseModel):
+    cards: list[T]
 
 
 class AbstractLangModel(ABC):
     @abstractmethod
-    def generate(
+    def generate[T: BaseModel](
         self,
         instruction: str,
-        attachment_path: Path,
-        user_input: str = "",
-    ) -> str:
+        document: Path,
+        response_class: type[T],
+        comment: str | None = None,
+    ) -> T:
         pass
 
-    def generate_cards(self):
+    def generate_cards(
+        self,
+        card_type: CardType,
+        document: Path,
+        comment: str | None = None,
+    ) -> list[BaseCard]:
+        card_class = utils.get_card_class_from_type(card_type)
+        batch_class = BatchCardResponse[card_class]
+
+        instruction = settings.card_prompts[card_type.value]
+
+        response = self.generate(instruction, document, batch_class, comment)
+        return response.cards
 
 
 class OpenAiModel(AbstractLangModel):
-    SUPPORTED_FILE_TYPES = {
-        "application/pdf",
-        "text/plain",
-        "text/markdown",
-    }
-
     def __init__(
         self,
         api_key: str = settings.openai_api_key,
@@ -38,18 +48,19 @@ class OpenAiModel(AbstractLangModel):
         self.model = model
         self.client = OpenAI(api_key=api_key)
 
-    def generate(
+    def generate[T: BaseModel](
         self,
         instruction: str,
-        attachment_path: Path,
-        user_input: str = "",
-        response_model,
-    ) -> str:
+        document: Path,
+        response_class: type[T],
+        comment: str | None = None,
+    ) -> T:
+        print(f"response_model: {response_class.__name__}")
 
-        file_mime = utils.get_file_mime(attachment_path)
-        file_content = utils.file_to_base64(attachment_path)
+        file_mime = utils.get_file_mime(document)
+        file_content = utils.file_to_base64(document)
 
-        if file_mime not in self.SUPPORTED_FILE_TYPES:
+        if file_mime not in consts.SUPPORTED_FILE_TYPES:
             raise Exception(f"Unsupported attachment file type: {file_mime}")
 
         response = self.client.responses.parse(
@@ -61,16 +72,20 @@ class OpenAiModel(AbstractLangModel):
                     "content": [
                         {
                             "type": "input_file",
-                            "filename": attachment_path.name,
+                            "filename": document.name,
                             "file_data": f"data:{file_mime};base64,{file_content}",
                         },
                         {
                             "type": "input_text",
-                            "text": user_input,
+                            "text": comment or "",
                         },
                     ],
                 }
             ],
-            text_format=MathFlashcardResponse,
+            text_format=response_class,
         )
+
+        if not response.output_parsed:
+            raise Exception(f"Model did not return a valid response. Please try again.")
+
         return response.output_parsed

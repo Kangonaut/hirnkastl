@@ -1,14 +1,9 @@
-from pathlib import Path
-from typing import Any, Self, TypeVar
+from typing import Any
 
-import yaml
-from platformdirs import PlatformDirs
-from pydantic import BaseModel, Field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from rich import print
 
 from hirnkastl import consts, utils
-from hirnkastl.cards import CodeTracingCard, Flashcard, MathCard
 
 DEFAULT_VALUE_REGISTRY: dict[str, Any] = {
     "card_prompts": consts.DEFAULT_CARD_PROMPTS,
