@@ -1,4 +1,5 @@
 import base64
+import json
 import random
 from datetime import datetime
 from pathlib import Path
@@ -6,14 +7,18 @@ from typing import TypeVar
 
 import filetype
 import genanki
+import typer
 import yaml
 from pydantic import BaseModel, TypeAdapter
 from pydantic_settings import BaseSettings
+from rich.console import Console
 
 from hirnkastl import consts
 from hirnkastl.cards import BaseCard, CardType, GenericCard, MathCard
 from hirnkastl.config import Config
 from hirnkastl.decks import Deck
+
+console = Console()
 
 
 def gen_anki_id() -> int:
@@ -28,7 +33,7 @@ def file_to_base64(path: Path) -> str:
 def get_file_mime(path: Path) -> str:
     kind = filetype.guess(path)
     if kind is None:
-        raise Exception(f"Cannot infer file type of {path}")
+        raise Exception(f"Cannot infer file type of {path}.")
     return kind.mime
 
 
@@ -153,3 +158,18 @@ def export_anki_deck(deck: genanki.Deck, path: Path) -> None:
 def gen_export_name() -> str:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     return f"hirnkastl-export-{timestamp}"
+
+
+def abort_with_error(message: str) -> None:
+    console.print(f"[bold red]ERROR:[/bold red] {message}")
+    raise typer.Exit(code=1)
+
+
+def save_cards_to_file(cards: list[BaseModel], path: Path) -> None:
+    data = [card.model_dump() for card in cards]
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def load_cards_from_file(path: Path, card_type_cls: type[BaseCard]) -> list[BaseModel]:
+    raw_data = json.loads(path.read_text(encoding="utf-8"))
+    return [card_type_cls(**item) for item in raw_data]

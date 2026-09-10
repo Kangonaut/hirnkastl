@@ -5,7 +5,13 @@ from platformdirs import PlatformDirs
 
 from hirnkastl.cards import CardType, GenericCard, MathCard
 
+dirs = PlatformDirs(appname="hirnkastl")
+
 PROMPTS_DIR = Path(__file__).parent / "prompts"
+CACHE_DIR = dirs.user_cache_dir
+CONFIG_FILE = dirs.user_config_path / "config.yaml"
+DECKS_CACHE_FILE = dirs.user_cache_path / "decks.yaml"
+EXPORTS_DIR = dirs.user_data_path / "exports"
 
 
 def _load_card_prompt(card_type: CardType) -> str:
@@ -14,8 +20,6 @@ def _load_card_prompt(card_type: CardType) -> str:
         raise FileNotFoundError(f"Prompt file not found: {path}")
     return path.read_text(encoding="utf-8").strip()
 
-
-dirs = PlatformDirs(appname="hirnkastl")
 
 CARD_CSS = """
 /* --- Default Light Mode --- */
@@ -171,13 +175,6 @@ CARD_TYPE_ANKI_MODELS = {
         css=CARD_CSS,
     ),
 }
-
-
-CONFIG_FILE = dirs.user_config_path / "config.yaml"
-
-DECKS_CACHE_FILE = dirs.user_cache_path / "decks.yaml"
-
-EXPORTS_DIR = dirs.user_data_path / "exports"
 
 
 SUPPORTED_FILE_TYPES = {

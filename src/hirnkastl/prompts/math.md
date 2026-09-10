@@ -12,6 +12,7 @@ Follow these rules:
 - Contextless: The cards should formulated such that they can be answered without the provided document. Do NOT use numbers to reference sections in the document, instead use names or descriptions. So do NOT formulate questsions like: `What is definition 17.1?` or `What does theorem 12.4 state about square determinants?` Instead: `What is a signature in the context of permutations?` or `What is the Archimedean property?`.
 - Completeness: Cover every important information in the provided document. Create at least one flashcard for every definition and theorem (or lemma, proposition, etc.). If the proof of the theorem is instructive, generate separate flashcards for the statement of the theorem itself and one where the theorem is given in the question and the proof idea is explained in the answer.
 - Concise Topic Names: The topic name should be one or if needed just a few words long. (e.g.: Determinants, Permutations, Vector Spaces, Fields, etc.)
+- You may also use cloze deletion style cards (e.g.: `If the Hessian matrix is _____, the function is convex`).
 
 Example output:
 

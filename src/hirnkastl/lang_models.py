@@ -56,6 +56,9 @@ class OpenAiModel(AbstractLangModel):
         response_class: type[T],
         comment: str | None = None,
     ) -> T:
+        if not document.exists():
+            raise FileNotFoundError("Document not found at path: {document}")
+
         file_mime = utils.get_file_mime(document)
         file_content = utils.file_to_base64(document)
 
@@ -84,13 +87,12 @@ class OpenAiModel(AbstractLangModel):
             text_format=response_class,
         )
 
-        raw_text: str = response.output_text
-        print(f"Raw Output Text:\n\n{raw_text}\n\n")
-
         if not response.output_parsed:
             raw_text: str = response.output_text
             print(f"Raw Output Text:\n\n{raw_text}\n\n")
 
-            raise Exception(f"Model did not return a valid response. Please try again.")
+            raise ValueError(
+                "The model did not return a valid response matching the card schema."
+            )
 
         return response.output_parsed

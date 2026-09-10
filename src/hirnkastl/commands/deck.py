@@ -1,3 +1,5 @@
+from typing import Annotated
+
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -13,17 +15,31 @@ console = Console()
 
 @app.command("add")
 def add_deck(
-    name: str,
-    description: str = Argument(default=""),
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="The unique name for the new deck.",
+        ),
+    ],
+    description: Annotated[
+        str,
+        typer.Argument(
+            default="",
+            help="An optional description of the deck's contents.",
+        ),
+    ],
 ):
+    """
+    Create a new Anki deck profile.
+
+    Registers a new deck with a unique ID in your local configuration,
+    which can then be used as a target for generating flashcards.
+    """
     decks = utils.load_decks()
 
     # check for unique name
     if name in decks:
-        console.print(
-            f"[bold red]ERROR:[/bold red] A deck named [cyan]{name}[/cyan] already exists."
-        )
-        raise typer.Exit(code=1)
+        utils.abort_with_error(f"A deck named [cyan]{name}[/cyan] already exists.")
 
     deck = Deck(deck_id=utils.gen_anki_id(), name=name, description=description)
     decks[name] = deck
@@ -34,6 +50,12 @@ def add_deck(
 
 @app.command("list")
 def list_decks():
+    """
+    List all configured Anki decks.
+
+    Displays a table of all locally saved decks, including their
+    unique IDs, names, and descriptions.
+    """
     decks = list(utils.load_decks().values())
     decks.sort(key=lambda d: d.name)
 
