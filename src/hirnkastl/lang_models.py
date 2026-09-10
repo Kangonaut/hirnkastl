@@ -2,15 +2,11 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 from openai import OpenAI
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model
 
 from hirnkastl import consts, utils
 from hirnkastl.cards import BaseCard, CardType
 from hirnkastl.config import settings
-
-
-class BatchCardResponse[T: BaseModel](BaseModel):
-    cards: list[T]
 
 
 class AbstractLangModel(ABC):
@@ -31,12 +27,15 @@ class AbstractLangModel(ABC):
         comment: str | None = None,
     ) -> list[BaseCard]:
         card_class = utils.get_card_class_from_type(card_type)
-        batch_class = BatchCardResponse[card_class]
+        response_class = create_model(
+            "BatchResponseModel",
+            cards=(list[card_class], ...),
+        )
 
         instruction = settings.card_prompts[card_type.value]
 
-        response = self.generate(instruction, document, batch_class, comment)
-        return response.cards
+        response = self.generate(instruction, document, response_class, comment)
+        return response.cards  # type: ignore
 
 
 class OpenAiModel(AbstractLangModel):
@@ -55,7 +54,7 @@ class OpenAiModel(AbstractLangModel):
         response_class: type[T],
         comment: str | None = None,
     ) -> T:
-        print(f"response_model: {response_class.__name__}")
+        print(f"response class: {response_class}")
 
         file_mime = utils.get_file_mime(document)
         file_content = utils.file_to_base64(document)

@@ -138,8 +138,8 @@ def deck_to_anki_deck(deck: Deck) -> genanki.Deck:
 
 def export_anki_deck(deck: genanki.Deck, export_name: str | None = None) -> Path:
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    path = consts.EXPORTS_DIR / (
-        f"{export_name}.apkg" or f"hirnkastl-export-{timestamp}.apkg"
-    )
+    path = consts.EXPORTS_DIR / f"{export_name or f"hirnkastl-export-{timestamp}"}.apkg"
+    path.parent.mkdir(parents=True, exist_ok=True)
+
     genanki.Package(deck).write_to_file(path)
     return path
