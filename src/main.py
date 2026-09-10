@@ -32,7 +32,7 @@ def setup():
         openai_model = questionary.text(
             message="OpenAI model:",
             validate=validators.validate_nonemtpy_str,
-            default="gpt-4o",
+            default="gpt-5.4-2026-03-05",
         ).unsafe_ask()
 
         config = Config.from_default(

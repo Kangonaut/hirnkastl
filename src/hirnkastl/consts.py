@@ -37,18 +37,6 @@ CARD_CSS = """
     margin-bottom: 6px;
     font-weight: 600;
 }
-.badge {
-    display: inline-block;
-    padding: 3px 8px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 4px;
-    background-color: #e1edf8;
-    color: #0366d6;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
 .question {
     font-weight: 600;
     font-size: 1.15rem;
@@ -64,6 +52,39 @@ hr {
     color: #24292e;
 }
 
+/* --- Base Badge Styling --- */
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    /* Default fallback colors */
+    background-color: #e1edf8;
+    color: #0366d6;
+}
+
+/* --- Badge Category Colors (Light Mode) --- */
+.badge[data-category="definition"] {
+    background-color: #ffeef0;
+    color: #d73a49; /* Red */
+}
+.badge[data-category="theorem"] {
+    background-color: #e1edf8;
+    color: #0366d6; /* Blue */
+}
+.badge[data-category="proof_idea"] {
+    background-color: #fff5e8;
+    color: #e36209; /* Orange */
+}
+.badge[data-category="exercise"] {
+    background-color: #e6ffed;
+    color: #28a745; /* Green */
+}
+
 /* --- Dark Mode Overrides --- */
 .nightMode.card {
     background-color: #0d1117;
@@ -72,16 +93,35 @@ hr {
 .nightMode .topic {
     color: #8b949e;
 }
-.nightMode .badge {
-    background-color: rgba(56, 139, 253, 0.15); /* Translucent blue looks better in dark mode */
-    color: #58a6ff;
-}
 .nightMode .question, 
 .nightMode .answer {
     color: #c9d1d9;
 }
 .nightMode hr {
     border-top: 1px solid #30363d;
+}
+
+/* --- Badge Category Colors (Dark Mode) --- */
+/* Using translucent backgrounds for a cleaner dark mode look */
+.nightMode .badge {
+    background-color: rgba(56, 139, 253, 0.15);
+    color: #58a6ff;
+}
+.nightMode .badge[data-category="definition"] {
+    background-color: rgba(255, 123, 114, 0.15);
+    color: #ff7b72;
+}
+.nightMode .badge[data-category="theorem"] {
+    background-color: rgba(56, 139, 253, 0.15);
+    color: #58a6ff;
+}
+.nightMode .badge[data-category="proof_idea"] {
+    background-color: rgba(210, 153, 34, 0.15);
+    color: #d29922;
+}
+.nightMode .badge[data-category="exercise"] {
+    background-color: rgba(46, 160, 67, 0.15);
+    color: #2ea043;
 }
 """
 
@@ -124,7 +164,7 @@ CARD_TYPE_ANKI_MODELS = {
         templates=[
             {
                 "name": "Math Card",
-                "qfmt": '<div class="topic">{{Topic}}</div><div class="badge">{{Category}}</div><div class="question">{{Question}}</div>',
+                "qfmt": '<div class="topic">{{Topic}}</div><div class="badge" data-category="{{Category}}">{{Category}}</div><div class="question">{{Question}}</div>',
                 "afmt": '{{FrontSide}}<hr><div class="answer">{{Answer}}</div>',
             }
         ],
