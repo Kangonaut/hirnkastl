@@ -1,15 +1,13 @@
 <div align="center">
 <img src="assets/icon.png" alt="icon" width="192"/>
 
-# hirnkastl
+# `hirnkastl`
 
 [![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Kangonaut/hirnkastl/blob/main/LICENSE)
 
 </div>
 
-# hirnkastl
-
-**hirnkastl** is a powerful command-line interface (CLI) tool that uses AI to automatically generate structured Anki flashcards from your study documents, lecture notes, and math scripts. Built with Python, Typer, Rich, and OpenAI.
+`hirnkastl` is a powerful command-line interface (CLI) tool that uses AI to automatically generate structured Anki flashcards from your study documents, lecture notes, and math scripts. Built with Python, Typer, Rich, and OpenAI.
 
 ## Features
 
