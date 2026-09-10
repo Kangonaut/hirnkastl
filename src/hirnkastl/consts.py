@@ -9,7 +9,10 @@ PROMPTS_DIR = Path(__file__).parent / "prompts"
 
 
 def _load_card_prompt(card_type: CardType) -> str:
-    path = PROMPTS_DIR / f"{card_type.value}.txt"
+    path = PROMPTS_DIR / f"{card_type.value}.md"
+    if not path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {path}")
+    return path.read_text(encoding="utf-8").strip()
 
 
 dirs = PlatformDirs(appname="hirnkastl")
@@ -87,10 +90,9 @@ CARD_TYPE_CLASSES = {
     CardType.MATH: MathCard,
 }
 
-DEFAULT_CARD_PROMPTS = {
-    CardType.GENERIC: "Some generic prompt.",
-    CardType.MATH: "You are a mathematics professor assistant. Extract fundamental definitions, core theorems, proof ideas, and exercises. Use LaTeX formatting.",
-}
+DEFAULT_CARD_PROMPTS = dict()
+for card_type in CardType:
+    DEFAULT_CARD_PROMPTS[card_type] = _load_card_prompt(card_type)
 
 CARD_TYPE_ANKI_MODELS = {
     CardType.GENERIC: genanki.Model(

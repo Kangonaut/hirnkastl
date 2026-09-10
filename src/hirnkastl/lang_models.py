@@ -56,8 +56,6 @@ class OpenAiModel(AbstractLangModel):
         response_class: type[T],
         comment: str | None = None,
     ) -> T:
-        print(f"response class: {response_class}")
-
         file_mime = utils.get_file_mime(document)
         file_content = utils.file_to_base64(document)
 
@@ -86,7 +84,13 @@ class OpenAiModel(AbstractLangModel):
             text_format=response_class,
         )
 
+        raw_text: str = response.output_text
+        print(f"Raw Output Text:\n\n{raw_text}\n\n")
+
         if not response.output_parsed:
+            raw_text: str = response.output_text
+            print(f"Raw Output Text:\n\n{raw_text}\n\n")
+
             raise Exception(f"Model did not return a valid response. Please try again.")
 
         return response.output_parsed
