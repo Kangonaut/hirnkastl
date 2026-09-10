@@ -4,6 +4,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from hirnkastl import consts, utils
+from hirnkastl.cards import CardType
 
 DEFAULT_VALUE_REGISTRY: dict[str, Any] = {
     "card_prompts": consts.DEFAULT_CARD_PROMPTS,
@@ -13,7 +14,7 @@ DEFAULT_VALUE_REGISTRY: dict[str, Any] = {
 class Config(BaseSettings):
     openai_api_key: str
     openai_model: str
-    card_prompts: dict[str, str] = Field(default_factory=dict)
+    card_prompts: dict[CardType, str] = Field(default_factory=dict)
 
     model_config = SettingsConfigDict(env_file=None)
 

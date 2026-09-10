@@ -1,11 +1,21 @@
+from pathlib import Path
+
 import genanki
 from platformdirs import PlatformDirs
 
 from hirnkastl.cards import CardType, GenericCard, MathCard
 
+PROMPTS_DIR = Path(__file__).parent / "prompts"
+
+
+def _load_card_prompt(card_type: CardType) -> str:
+    path = PROMPTS_DIR / f"{card_type.value}.txt"
+
+
 dirs = PlatformDirs(appname="hirnkastl")
 
 CARD_CSS = """
+/* --- Default Light Mode --- */
 .card {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 16px;
@@ -50,11 +60,36 @@ hr {
 .answer {
     color: #24292e;
 }
+
+/* --- Dark Mode Overrides --- */
+.nightMode.card {
+    background-color: #0d1117;
+    color: #c9d1d9;
+}
+.nightMode .topic {
+    color: #8b949e;
+}
+.nightMode .badge {
+    background-color: rgba(56, 139, 253, 0.15); /* Translucent blue looks better in dark mode */
+    color: #58a6ff;
+}
+.nightMode .question, 
+.nightMode .answer {
+    color: #c9d1d9;
+}
+.nightMode hr {
+    border-top: 1px solid #30363d;
+}
 """
 
 CARD_TYPE_CLASSES = {
     CardType.GENERIC: GenericCard,
     CardType.MATH: MathCard,
+}
+
+DEFAULT_CARD_PROMPTS = {
+    CardType.GENERIC: "Some generic prompt.",
+    CardType.MATH: "You are a mathematics professor assistant. Extract fundamental definitions, core theorems, proof ideas, and exercises. Use LaTeX formatting.",
 }
 
 CARD_TYPE_ANKI_MODELS = {
@@ -102,11 +137,6 @@ DECKS_CACHE_FILE = dirs.user_cache_path / "decks.yaml"
 
 EXPORTS_DIR = dirs.user_data_path / "exports"
 
-DEFAULT_CARD_PROMPTS = {
-    "math": "You are a mathematics professor assistant. Extract fundamental definitions, core theorems, proof ideas, and exercises. Use LaTeX formatting.",
-    "language": "You are an instructor. Extract the most important information into flashcards.",
-    "code": "You are a computer science professor assistant. Extract concise, self-contained code snippets featuring execution logic or bugs, with step-by-step memory traces.",
-}
 
 SUPPORTED_FILE_TYPES = {
     "application/pdf",

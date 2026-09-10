@@ -4,9 +4,8 @@ from pathlib import Path
 from openai import OpenAI
 from pydantic import BaseModel, create_model
 
-from hirnkastl import consts, utils
+from hirnkastl import config, consts, utils
 from hirnkastl.cards import BaseCard, CardType
-from hirnkastl.config import settings
 
 
 class AbstractLangModel(ABC):
@@ -32,7 +31,7 @@ class AbstractLangModel(ABC):
             cards=(list[card_class], ...),
         )
 
-        instruction = settings.card_prompts[card_type.value]
+        instruction = config.settings.card_prompts[card_type]
 
         response = self.generate(instruction, document, response_class, comment)
         return response.cards  # type: ignore
@@ -41,9 +40,12 @@ class AbstractLangModel(ABC):
 class OpenAiModel(AbstractLangModel):
     def __init__(
         self,
-        api_key: str = settings.openai_api_key,
-        model: str = settings.openai_model,
+        api_key: str | None = None,
+        model: str | None = None,
     ):
+        api_key = api_key or config.settings.openai_api_key
+        model = model or config.settings.openai_model
+
         self.model = model
         self.client = OpenAI(api_key=api_key)
 
