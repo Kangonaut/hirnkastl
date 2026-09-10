@@ -7,7 +7,7 @@
 
 </div>
 
-`hirnkastl` is a powerful command-line interface (CLI) tool that uses AI to automatically generate structured Anki flashcards from your study documents, lecture notes, and math scripts. Built with Python, Typer, Rich, and OpenAI.
+`hirnkastl` is a command-line tool (CLI) tool that uses AI to automatically generate structured Anki flashcards from your lecture notes. Built with Python, Typer, Rich, and OpenAI.
 
 ## Features
 
