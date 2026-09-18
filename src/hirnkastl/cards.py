@@ -17,16 +17,17 @@ class GenericCard(BaseCard):
 class MathCardCategory(str, Enum):
     DEFINITION = "definition"
     THEOREM = "theorem"
-    PROOF_IDEA = "proof_idea"
+    PROOF = "proof"
     EXERCISE = "exercise"
+    CONCEPTUAL = "conceptual"
 
 
 class MathCard(BaseCard):
-    category: MathCardCategory = Field(
-        description="theorem, definition, proof idea, or exercise"
-    )
     question: str = Field(description="the front side of the card")
     answer: str = Field(description="the back side of the card")
+    category: MathCardCategory = Field(
+        description="theorem, definition, exercise or conceptual"
+    )
     topic: str
 
 

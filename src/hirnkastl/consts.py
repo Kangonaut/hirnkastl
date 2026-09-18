@@ -80,13 +80,17 @@ hr {
     background-color: #e1edf8;
     color: #0366d6; /* Blue */
 }
-.badge[data-category="proof_idea"] {
+.badge[data-category="proof"] {
     background-color: #fff5e8;
     color: #e36209; /* Orange */
 }
 .badge[data-category="exercise"] {
     background-color: #e6ffed;
     color: #28a745; /* Green */
+}
+.badge[data-category="conceptual"] {
+    background-color: #f5f0ff;
+    color: #6f42c1; /* Purple */
 }
 
 /* --- Dark Mode Overrides --- */
@@ -119,13 +123,17 @@ hr {
     background-color: rgba(56, 139, 253, 0.15);
     color: #58a6ff;
 }
-.nightMode .badge[data-category="proof_idea"] {
+.nightMode .badge[data-category="proof"] {
     background-color: rgba(210, 153, 34, 0.15);
     color: #d29922;
 }
 .nightMode .badge[data-category="exercise"] {
     background-color: rgba(46, 160, 67, 0.15);
     color: #2ea043;
+}
+.nightMode .badge[data-category="conceptual"] {
+    background-color: rgba(210, 168, 255, 0.15);
+    color: #d2a8ff;
 }
 """
 
