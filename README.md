@@ -98,9 +98,3 @@ hirnkastl gen math-deck math skriptum-ausschnitt.pdf --tags algebra --tags exam-
 ## License
 
 Distributed under the [Apache License 2.0](https://github.com/Kangonaut/hirnkastl/blob/main/LICENSE).
-
----
-
-<div align="center">
-<a href="https://www.buymeacoffee.com/kangonaut" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-</div>
