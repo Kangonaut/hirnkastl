@@ -3,7 +3,7 @@
 
 # `hirnkastl`
 
-[![license](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Kangonaut/hirnkastl/blob/main/LICENSE)
+[![license](https://img.shields.io/badge/license-Apache%20License%202.0-blue)](https://github.com/Kangonaut/hirnkastl/blob/main/LICENSE)
 
 </div>
 
